@@ -9,9 +9,17 @@ if
     [[ -z "${OP_AWS_ACCOUNTS}" ]] ||
     [[ -z "${AWS_EMAIL}" ]];
 then
-    echo "$(date -u) - ERROR: Missing environment variables, see README.md"
-    exit 1
+    die "Missing environment variables, see README.md"
 fi
+
+# Verify all the command line tools are installed
+need() {
+    which "$1" &>/dev/null || die "Binary '$1' is missing but required"
+}
+
+need "jq"
+need "op"
+need "aws"
 
 # Sign into 1Password
 eval $(op signin "${OP_DOMAIN}")

@@ -3,8 +3,8 @@
 ## Usage
 
 - Install and configure 1Password
-- Install 1Password CLI
-- Install AWS CLI
+- Install [1Password CLI](https://app-updates.agilebits.com/product_history/CLI)
+- Install [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 
 ### Set up Global Environment Variables
 
@@ -22,7 +22,7 @@ export AWS_EMAIL=""
 ### Sign into 1Password on the CLI
 
 ```bash
-# Sign into 1Password on the CLI and provide 1Password secret
+# Sign into 1Password on the CLI and provide 1Password Secret Key
 op signin ${OP_DOMAIN} ${AWS_EMAIL}
 ```
 
@@ -31,6 +31,6 @@ op signin ${OP_DOMAIN} ${AWS_EMAIL}
 ```bash
 # Copy script to /usr/local/bin
 cp opaws.sh /usr/local/bin/opaws
-# Run opaws and then provide your 1Password password
+# Run opaws and then provide your 1Password Password
 opaws AWS-Development
 ```
