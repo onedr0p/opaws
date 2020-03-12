@@ -10,9 +10,7 @@ After following the guide below you can finally use opaws
 # Copy script to /usr/local/bin
 cp opaws.sh /usr/local/bin/opaws
 # Run opaws and then provide your 1Password Password at the prompt
-opaws
-# Opitionally you can provide the default account name for AWS CLI to use
-opaws AWS-Development
+opaws <1Password AWS account title> <domain>.1password.com <aws email address>
 ```
 
 ## Setup Guide
