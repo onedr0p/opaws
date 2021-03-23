@@ -63,30 +63,37 @@ aws_arn="arn:aws:iam::${account_id}:mfa/${account_email}"
 [[ ${LOG_LEVEL} -ge 2 ]] && echo "DEBUG - AWS ARN: ${aws_arn}"
 
 # Get the MFA code
-token=$(op get totp ${OP_AWS_ACCOUNT})
-[[ ${LOG_LEVEL} -ge 2 ]] && echo "DEBUG - MFA Token: ${token}"
+token=$(op get totp ${OP_AWS_ACCOUNT} >/dev/null 2>&1)
 
-# Sign in and get the AWS Credential information
-creds=$(aws \
-  --profile "${OP_AWS_ACCOUNT}-default" sts get-session-token \
-  --duration "86400" \
-  --serial-number "${aws_arn}" \
-  --token-code "${token}" \
-  --output json
-)
+# No token? Use standard credentials
+if [[ -z $token ]]; then
+  aws --profile "default" configure set aws_access_key_id "${account_access_key}"
+  aws --profile "default" configure set aws_secret_access_key "${account_secret_key}"
+else
+  [[ ${LOG_LEVEL} -ge 2 ]] && echo "DEBUG - MFA Token: ${token}"
 
-# Set the AWS account information
-aws_access_key_id=$(echo ${creds} | jq -r '.Credentials.AccessKeyId')
-[[ ${LOG_LEVEL} -ge 2 ]] && echo "DEBUG - Temporary access key id: ${aws_access_key_id}"
-aws_secret_access_key=$(echo ${creds} | jq -r '.Credentials.SecretAccessKey')
-[[ ${LOG_LEVEL} -ge 2 ]] && echo "DEBUG - Temporary secret access key: ${aws_secret_access_key}"
-aws_session_token=$(echo ${creds} | jq -r '.Credentials.SessionToken')
-[[ ${LOG_LEVEL} -ge 2 ]] && echo "DEBUG - Temporary session token: ${aws_session_token}"
+  # Sign in and get the AWS Credential information
+  creds=$(aws \
+    --profile "${OP_AWS_ACCOUNT}-default" sts get-session-token \
+    --duration "86400" \
+    --serial-number "${aws_arn}" \
+    --token-code "${token}" \
+    --output json
+  )
 
-# Set the aws profile session tokens
-aws --profile "default" configure set aws_access_key_id "${aws_access_key_id}"
-aws --profile "default" configure set aws_secret_access_key "${aws_secret_access_key}"
-aws --profile "default" configure set aws_session_token "${aws_session_token}"
+  # Set the AWS account information
+  aws_access_key_id=$(echo ${creds} | jq -r '.Credentials.AccessKeyId')
+  [[ ${LOG_LEVEL} -ge 2 ]] && echo "DEBUG - Temporary access key id: ${aws_access_key_id}"
+  aws_secret_access_key=$(echo ${creds} | jq -r '.Credentials.SecretAccessKey')
+  [[ ${LOG_LEVEL} -ge 2 ]] && echo "DEBUG - Temporary secret access key: ${aws_secret_access_key}"
+  aws_session_token=$(echo ${creds} | jq -r '.Credentials.SessionToken')
+  [[ ${LOG_LEVEL} -ge 2 ]] && echo "DEBUG - Temporary session token: ${aws_session_token}"
+
+  # Set the aws profile session tokens
+  aws --profile "default" configure set aws_access_key_id "${aws_access_key_id}"
+  aws --profile "default" configure set aws_secret_access_key "${aws_secret_access_key}"
+  aws --profile "default" configure set aws_session_token "${aws_session_token}"
+fi
 
 # Verify success or failure
 if aws sts get-caller-identity >/dev/null 2>&1; then
