@@ -1,18 +1,17 @@
 # opaws
 
-CLI tool to sign into AWS (MFA) accounts using 1Password
+CLI tool to sign into AWS accounts using 1Password
 
 ## Usage
 
-After following the guide below you can finally use opaws
-
-```bash
-# First signin to Password CLI if you haven't already
-op signin <domain>.1password.com <op-email-address>
-# Copy script to /usr/local/bin
-ln -s opaws.sh /usr/local/bin/opaws
-# Run opaws and then provide your 1Password Password at the prompt
-opaws <domain>.1password.com <1password-aws-accounttitle>
+```sh
+Usage: opaws.sh <options>
+    -h, --help               Display help
+    -a, --aws-account        AWS Account as specified by title in 1Password (required)
+    -d, --domain             1Password domain to use (required)
+    -e, --email              1Password email address to use (required)
+    -v, --vault              1Password vault to use (default: Personal)
+    --debug                  Enable debug mode
 ```
 
 ## Setup Guide
