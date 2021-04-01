@@ -147,12 +147,12 @@ login() {
 }
 
 credentials() {
-    op_item_json="$(op get item "${aws_account}")"
+    op_item_json="$(op --session "${session}" get item "${aws_account}")"
 
     # Extract AWS account information from 1Password
-    account_email=$(op get item ${aws_account} | jq -r '.overview.ainfo')
+    account_email=$(op --session "${session}" get item ${aws_account} | jq -r '.overview.ainfo')
     [[ ${debug} -gt 0 ]] && echo "DEBUG - Account Email: ${account_email}"
-    account_url=$(op get item ${aws_account} | jq -r '.overview.url')
+    account_url=$(op --session "${session}" get item ${aws_account} | jq -r '.overview.url')
     [[ ${debug} -gt 0 ]] && echo "DEBUG - Account URL: ${account_url}"
     account_id=$(echo $account_url | awk -F[/:] '{print $4}' | awk -F[.] '{print $1}')
     [[ ${debug} -gt 0 ]] && echo "DEBUG - Account ID: ${account_id}"
@@ -170,7 +170,7 @@ credentials() {
     [[ ${debug} -gt 0 ]] && echo "DEBUG - AWS ARN: ${aws_arn}"
 
     # Get the MFA code
-    token=$(op get totp ${aws_account} >/dev/null 2>&1)
+    token=$(op --session "${session}" get totp ${aws_account} >/dev/null 2>&1)
 
     # No token? Use standard credentials
     if [[ -z $token ]]; then
