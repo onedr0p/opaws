@@ -6,6 +6,8 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+MFA_REGEX="^([0-9]{6})$"
+
 show_help() {
 cat << EOF
 Usage: $(basename "$0") <options>
@@ -170,10 +172,10 @@ credentials() {
     [[ ${debug} -gt 0 ]] && echo "DEBUG - AWS ARN: ${aws_arn}"
 
     # Get the MFA code
-    token=$(op --session "${session}" get totp ${aws_account} >/dev/null 2>&1)
+    token=$(op --session "${session}" get totp ${aws_account})
 
     # No token? Use standard credentials
-    if [[ -z $token ]]; then
+    if [[ ! $token =~ $MFA_REGEX ]]; then
         aws --profile "default" configure set aws_access_key_id "${account_access_key}"
         aws --profile "default" configure set aws_secret_access_key "${account_secret_key}"
     else
