@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-#!/usr/bin/env bash
-
 set -o errexit
 set -o nounset
 set -o pipefail
@@ -133,7 +131,7 @@ check() {
 }
 
 login() {
-    if [ -v "${session}" ]; then
+    if [[ ! -z "${session}" ]]; then
         echo "OP_SESSION_${domain} variable exists"
         if ! op get user "${email}" --session "${!session}" >/dev/null 2>&1; then
             echo "OP_SESSION_${domain} token invalid"
